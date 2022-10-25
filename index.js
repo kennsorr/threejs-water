@@ -42,10 +42,10 @@ loadFile('shaders/utils.glsl').then((utils) => {
   controls.screen.width = width;
   controls.screen.height = height;
 
-  controls.rotateSpeed = 2.5;
-  controls.zoomSpeed = 1.2;
-  controls.panSpeed = 0.9;
-  controls.dynamicDampingFactor = 0.9;
+  // controls.rotateSpeed = 2.5;
+  // controls.zoomSpeed = 1.2;
+  // controls.panSpeed = 0.9;
+  // controls.dynamicDampingFactor = 0.9;
 
   // Ray caster
   const raycaster = new THREE.Raycaster();
@@ -160,49 +160,6 @@ loadFile('shaders/utils.glsl').then((utils) => {
   }
 
 
-  class Caustics {
-
-    constructor(lightFrontGeometry) {
-      this._camera = new THREE.OrthographicCamera(0, 1, 1, 0, 0, 2000);
-
-      this._geometry = lightFrontGeometry;
-
-      this.texture = new THREE.WebGLRenderTarget(1024, 1024, {type: THREE.UNSIGNED_BYTE});
-
-      const shadersPromises = [
-        loadFile('shaders/caustics/vertex.glsl'),
-        loadFile('shaders/caustics/fragment.glsl')
-      ];
-
-      this.loaded = Promise.all(shadersPromises)
-          .then(([vertexShader, fragmentShader]) => {
-        const material = new THREE.RawShaderMaterial({
-          uniforms: {
-              light: { value: light },
-              water: { value: null },
-          },
-          vertexShader: vertexShader,
-          fragmentShader: fragmentShader,
-        });
-
-        this._causticMesh = new THREE.Mesh(this._geometry, material);
-      });
-    }
-
-    update(renderer, waterTexture) {
-      this._causticMesh.material.uniforms['water'].value = waterTexture;
-
-      renderer.setRenderTarget(this.texture);
-      renderer.setClearColor(black, 0);
-      renderer.clear();
-
-      // TODO Camera is useless here, what should be done?
-      renderer.render(this._causticMesh, this._camera);
-    }
-
-  }
-
-
   class Water {
 
     constructor() {
@@ -232,9 +189,8 @@ loadFile('shaders/utils.glsl').then((utils) => {
       });
     }
 
-    draw(renderer, waterTexture, causticsTexture) {
+    draw(renderer, waterTexture) {
       this.material.uniforms['water'].value = waterTexture;
-      this.material.uniforms['causticTex'].value = causticsTexture;
 
       this.material.side = THREE.FrontSide;
       this.material.uniforms['underwater'].value = true;
@@ -249,7 +205,6 @@ loadFile('shaders/utils.glsl').then((utils) => {
 
 
   class Pool {
-
     constructor() {
       this._geometry = new THREE.BufferGeometry();
       const vertices = new Float32Array([
@@ -317,9 +272,8 @@ loadFile('shaders/utils.glsl').then((utils) => {
       });
     }
 
-    draw(renderer, waterTexture, causticsTexture) {
+    draw(renderer, waterTexture) {
       this._material.uniforms['water'].value = waterTexture;
-      this._material.uniforms['causticTex'].value = causticsTexture;
 
       renderer.render(this._mesh, camera);
     }
@@ -363,7 +317,6 @@ loadFile('shaders/utils.glsl').then((utils) => {
 
   const waterSimulation = new WaterSimulation();
   const water = new Water();
-  const caustics = new Caustics(water.geometry);
   const pool = new Pool();
 
   const debug = new Debug();
@@ -376,18 +329,12 @@ loadFile('shaders/utils.glsl').then((utils) => {
 
     const waterTexture = waterSimulation.texture.texture;
 
-    caustics.update(renderer, waterTexture);
-
-    const causticsTexture = caustics.texture.texture;
-
-    // debug.draw(renderer, causticsTexture);
-
     renderer.setRenderTarget(null);
     renderer.setClearColor(white, 1);
     renderer.clear();
 
-    water.draw(renderer, waterTexture, causticsTexture);
-    pool.draw(renderer, waterTexture, causticsTexture);
+    water.draw(renderer, waterTexture);
+    pool.draw(renderer, waterTexture);
 
     controls.update();
 
@@ -409,7 +356,7 @@ loadFile('shaders/utils.glsl').then((utils) => {
     }
   }
 
-  const loaded = [waterSimulation.loaded, caustics.loaded, water.loaded, pool.loaded, debug.loaded];
+  const loaded = [waterSimulation.loaded, water.loaded, pool.loaded, debug.loaded];
 
   Promise.all(loaded).then(() => {
     canvas.addEventListener('mousemove', { handleEvent: onMouseMove });
