@@ -1,10 +1,11 @@
+import { OrbitControls } from "https://unpkg.com/three@0.112/examples/jsm/controls/OrbitControls.js";
+
 const canvas = document.getElementById('canvas');
 
 const width = canvas.width;
 const height = canvas.height;
 
-// Colors
-const black = new THREE.Color('black');
+// Color
 const white = new THREE.Color('white');
 
 function loadFile(filename) {
@@ -34,13 +35,11 @@ loadFile('shaders/utils.glsl').then((utils) => {
   const light = [0.7559289460184544, 0.7559289460184544, -0.3779644730092272];
 
   // Create mouse Controls
-  const controls = new THREE.OrbitControls(
+  const controls = new OrbitControls(
     camera,
     canvas
   );
 
-  controls.screen.width = width;
-  controls.screen.height = height;
   controls.maxPolarAngle = Math.PI / 2;
 
   // controls.rotateSpeed = 2.5;
@@ -409,8 +408,6 @@ loadFile('shaders/utils.glsl').then((utils) => {
     }
   
     // Update the internal size for raycaster calculations
-    controls.screen.width = newWidth;
-    controls.screen.height = newHeight;
     controls.update();
   }
   
