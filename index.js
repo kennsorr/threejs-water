@@ -358,6 +358,39 @@ loadFile('shaders/utils.glsl').then((utils) => {
 
   const loaded = [waterSimulation.loaded, water.loaded, pool.loaded, debug.loaded];
 
+  function onWindowResize() {
+    // Calculate the new size you want
+    const aspectRatio = 16 / 9; // Adjust the aspect ratio if needed
+    let newWidth = window.innerWidth;
+    let newHeight = window.innerHeight;
+  
+    // Adjust the sizes if necessary to maintain the aspect ratio
+    if (newHeight < newWidth / aspectRatio) {
+      newWidth = newHeight * aspectRatio;
+    } else {
+      newHeight = newWidth / aspectRatio;
+    }
+  
+    // Update camera aspect ratio and renderer size
+    camera.aspect = newWidth / newHeight;
+    camera.updateProjectionMatrix();
+    
+    renderer.setSize(newWidth, newHeight);
+    renderer.setPixelRatio(window.devicePixelRatio); // For high DPI screens
+    
+    // Update any additional controls or elements that rely on size
+    if (controls.handleResize) {
+      controls.handleResize();
+    }
+  
+    // Update the internal size for raycaster calculations
+    controls.screen.width = newWidth;
+    controls.screen.height = newHeight;
+  }
+  
+  // Listen for window resize events
+  window.addEventListener('resize', onWindowResize, false);
+
   Promise.all(loaded).then(() => {
     canvas.addEventListener('mousemove', { handleEvent: onMouseMove });
 
@@ -368,7 +401,7 @@ loadFile('shaders/utils.glsl').then((utils) => {
         0.03, (i & 1) ? 0.02 : -0.02
       );
     }
-
+    onWindowResize()
     animate();
   });
 
