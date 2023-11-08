@@ -1,10 +1,11 @@
+import { OrbitControls } from "https://unpkg.com/three@0.112/examples/jsm/controls/OrbitControls.js";
+
 const canvas = document.getElementById('canvas');
 
 const width = canvas.width;
 const height = canvas.height;
 
-// Colors
-const black = new THREE.Color('black');
+// Color
 const white = new THREE.Color('white');
 
 function loadFile(filename) {
@@ -34,13 +35,12 @@ loadFile('shaders/utils.glsl').then((utils) => {
   const light = [0.7559289460184544, 0.7559289460184544, -0.3779644730092272];
 
   // Create mouse Controls
-  const controls = new THREE.TrackballControls(
+  const controls = new OrbitControls(
     camera,
     canvas
   );
 
-  controls.screen.width = width;
-  controls.screen.height = height;
+  controls.maxPolarAngle = Math.PI / 2;
 
   // controls.rotateSpeed = 2.5;
   // controls.zoomSpeed = 1.2;
@@ -321,6 +321,30 @@ loadFile('shaders/utils.glsl').then((utils) => {
 
   const debug = new Debug();
 
+  function onMouseDown(event) {
+    // Get the mouse position relative to the canvas
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;    // Adjust these scales if you are using CSS to size the canvas
+    const scaleY = canvas.height / rect.height;
+  
+    // Normalize the coordinate system to -1 to 1 (-1,1 being top left and 1,-1 being bottom right)
+    mouse.x = ((event.clientX - rect.left) * scaleX) * 2 / canvas.width - 1;
+    mouse.y = -((event.clientY - rect.top) * scaleY) * 2 / canvas.height + 1;
+  
+    // Update the raycaster
+    raycaster.setFromCamera(mouse, camera);
+  
+    // Find intersects with the plane
+    const intersects = raycaster.intersectObject(targetmesh);
+  
+    // If there's an intersection, create a ripple
+    if (intersects.length > 0) {
+      const intersect = intersects[0];
+      // Add a drop at the intersect point with your desired radius and strength for the ripple
+      waterSimulation.addDrop(renderer, intersect.point.x, intersect.point.z, 0.1, 0.1);
+    }
+  }
+  canvas.addEventListener('mousedown', onMouseDown );
 
   // Main rendering loop
   function animate() {
@@ -352,14 +376,46 @@ loadFile('shaders/utils.glsl').then((utils) => {
     const intersects = raycaster.intersectObject(targetmesh);
 
     for (let intersect of intersects) {
-      waterSimulation.addDrop(renderer, intersect.point.x, intersect.point.z, 0.03, 0.04);
+      waterSimulation.addDrop(renderer, intersect.point.x, intersect.point.z, 0.02, 0.04);
     }
   }
 
   const loaded = [waterSimulation.loaded, water.loaded, pool.loaded, debug.loaded];
 
+  function onWindowResize() {
+    // Calculate the new size you want
+    const aspectRatio = 16 / 9; // Adjust the aspect ratio if needed
+    let newWidth = window.innerWidth;
+    let newHeight = window.innerHeight;
+  
+    // Adjust the sizes if necessary to maintain the aspect ratio
+    // if (newHeight < newWidth / aspectRatio) {
+    //   newWidth = newHeight * aspectRatio;
+    // } else {
+    //   newHeight = newWidth / aspectRatio;
+    // }
+  
+    // Update camera aspect ratio and renderer size
+    camera.aspect = newWidth / newHeight;
+    camera.updateProjectionMatrix();
+    
+    renderer.setSize(newWidth, newHeight);
+    renderer.setPixelRatio(window.devicePixelRatio); // For high DPI screens
+    
+    // Update any additional controls or elements that rely on size
+    if (controls.handleResize) {
+      controls.handleResize();
+    }
+  
+    // Update the internal size for raycaster calculations
+    controls.update();
+  }
+  
+  // Listen for window resize events
+  window.addEventListener('resize', onWindowResize, false);
+
   Promise.all(loaded).then(() => {
-    canvas.addEventListener('mousemove', { handleEvent: onMouseMove });
+    canvas.addEventListener('mousemove', onMouseMove );
 
     for (var i = 0; i < 20; i++) {
       waterSimulation.addDrop(
@@ -368,7 +424,7 @@ loadFile('shaders/utils.glsl').then((utils) => {
         0.03, (i & 1) ? 0.02 : -0.02
       );
     }
-
+    onWindowResize()
     animate();
   });
 
