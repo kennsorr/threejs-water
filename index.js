@@ -50,13 +50,12 @@ loadFile('shaders/utils.glsl').then((utils) => {
   // Ray caster
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
-  const targetgeometry = new THREE.PlaneGeometry(2, 2);
+  const targetgeometry = new THREE.PlaneGeometry(4, 4);
   for (let vertex of targetgeometry.vertices) {
     vertex.z = - vertex.y;
     vertex.y = 0.;
   }
   const targetmesh = new THREE.Mesh(targetgeometry);
-  targetmesh.scale.set(2, 1, 2);
   targetmesh.updateMatrixWorld();
 
   // Textures
@@ -165,7 +164,7 @@ loadFile('shaders/utils.glsl').then((utils) => {
   class Water {
 
     constructor() {
-      this.geometry = new THREE.PlaneBufferGeometry(2, 2, 200, 200);
+      this.geometry = new THREE.PlaneBufferGeometry(4, 4, 400, 400);
 
       const shadersPromises = [
         loadFile('shaders/water/vertex.glsl'),
@@ -188,7 +187,6 @@ loadFile('shaders/utils.glsl').then((utils) => {
         });
 
         this.mesh = new THREE.Mesh(this.geometry, this.material);
-        this.mesh.scale.set(2, 1, 2);
       });
     }
 
@@ -211,30 +209,30 @@ loadFile('shaders/utils.glsl').then((utils) => {
     constructor() {
       this._geometry = new THREE.BufferGeometry();
       const vertices = new Float32Array([
-        -1, -1, -1,
-        -1, -1, 1,
-        -1, 1, -1,
-        -1, 1, 1,
-        1, -1, -1,
-        1, 1, -1,
-        1, -1, 1,
-        1, 1, 1,
-        -1, -1, -1,
-        1, -1, -1,
-        -1, -1, 1,
-        1, -1, 1,
-        -1, 1, -1,
-        -1, 1, 1,
-        1, 1, -1,
-        1, 1, 1,
-        -1, -1, -1,
-        -1, 1, -1,
-        1, -1, -1,
-        1, 1, -1,
-        -1, -1, 1,
-        1, -1, 1,
-        -1, 1, 1,
-        1, 1, 1
+        -2, -1, -2,
+        -2, -1,  2,
+        -2,  1, -2,
+        -2,  1,  2,
+         2, -1, -2,
+         2,  1, -2,
+         2, -1,  2,
+         2,  1,  2,
+        -2, -1, -2,
+         2, -1, -2,
+        -2, -1,  2,
+         2, -1,  2,
+        -2,  1, -2,
+        -2,  1,  2,
+         2,  1, -2,
+         2,  1,  2,
+        -2, -1, -2,
+        -2,  1, -2,
+         2, -1, -2,
+         2,  1, -2,
+        -2, -1,  2,
+         2, -1,  2,
+        -2,  1,  2,
+         2,  1,  2
       ]);
       const indices = new Uint32Array([
         0, 1, 2,
@@ -272,7 +270,6 @@ loadFile('shaders/utils.glsl').then((utils) => {
         this._material.side = THREE.FrontSide;
 
         this._mesh = new THREE.Mesh(this._geometry, this._material);
-        this._mesh.scale.set(2, 1, 2);
       });
     }
 
