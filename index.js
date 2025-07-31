@@ -24,7 +24,7 @@ loadFile('shaders/utils.glsl').then((utils) => {
 
   // Create Renderer
   const camera = new THREE.PerspectiveCamera(75, width / height, 0.01, 100);
-  camera.position.set(0.426, 0.677, -2.095);
+  camera.position.set(0.426, 0.677, -3.0);
   camera.rotation.set(2.828, 0.191, 3.108);
 
   const renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true, alpha: true});
@@ -50,12 +50,13 @@ loadFile('shaders/utils.glsl').then((utils) => {
   // Ray caster
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
-  const targetgeometry = new THREE.PlaneGeometry(2, 2);
+  const targetgeometry = new THREE.PlaneGeometry(4, 4);
   for (let vertex of targetgeometry.vertices) {
     vertex.z = - vertex.y;
     vertex.y = 0.;
   }
   const targetmesh = new THREE.Mesh(targetgeometry);
+  targetmesh.updateMatrixWorld();
 
   // Textures
   const cubetextureloader = new THREE.CubeTextureLoader();
@@ -163,7 +164,7 @@ loadFile('shaders/utils.glsl').then((utils) => {
   class Water {
 
     constructor() {
-      this.geometry = new THREE.PlaneBufferGeometry(2, 2, 200, 200);
+      this.geometry = new THREE.PlaneBufferGeometry(4, 4, 400, 400);
 
       const shadersPromises = [
         loadFile('shaders/water/vertex.glsl'),
@@ -208,42 +209,14 @@ loadFile('shaders/utils.glsl').then((utils) => {
     constructor() {
       this._geometry = new THREE.BufferGeometry();
       const vertices = new Float32Array([
-        -1, -1, -1,
-        -1, -1, 1,
-        -1, 1, -1,
-        -1, 1, 1,
-        1, -1, -1,
-        1, 1, -1,
-        1, -1, 1,
-        1, 1, 1,
-        -1, -1, -1,
-        1, -1, -1,
-        -1, -1, 1,
-        1, -1, 1,
-        -1, 1, -1,
-        -1, 1, 1,
-        1, 1, -1,
-        1, 1, 1,
-        -1, -1, -1,
-        -1, 1, -1,
-        1, -1, -1,
-        1, 1, -1,
-        -1, -1, 1,
-        1, -1, 1,
-        -1, 1, 1,
-        1, 1, 1
+        -2,  1, -2,
+        -2,  1,  2,
+         2,  1, -2,
+         2,  1,  2,
       ]);
       const indices = new Uint32Array([
         0, 1, 2,
         2, 1, 3,
-        4, 5, 6,
-        6, 5, 7,
-        12, 13, 14,
-        14, 13, 15,
-        16, 17, 18,
-        18, 17, 19,
-        20, 21, 22,
-        22, 21, 23
       ]);
 
       this._geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
@@ -341,7 +314,7 @@ loadFile('shaders/utils.glsl').then((utils) => {
     if (intersects.length > 0) {
       const intersect = intersects[0];
       // Add a drop at the intersect point with your desired radius and strength for the ripple
-      waterSimulation.addDrop(renderer, intersect.point.x, intersect.point.z, 0.1, 0.1);
+      waterSimulation.addDrop(renderer, intersect.point.x / 2, intersect.point.z / 2, 0.1, 0.1);
     }
   }
   canvas.addEventListener('mousedown', onMouseDown );
@@ -376,7 +349,7 @@ loadFile('shaders/utils.glsl').then((utils) => {
     const intersects = raycaster.intersectObject(targetmesh);
 
     for (let intersect of intersects) {
-      waterSimulation.addDrop(renderer, intersect.point.x, intersect.point.z, 0.02, 0.04);
+      waterSimulation.addDrop(renderer, intersect.point.x / 2, intersect.point.z / 2, 0.02, 0.04);
     }
   }
 
@@ -420,7 +393,7 @@ loadFile('shaders/utils.glsl').then((utils) => {
     for (var i = 0; i < 20; i++) {
       waterSimulation.addDrop(
         renderer,
-        Math.random() * 2 - 1, Math.random() * 2 - 1,
+        (Math.random() * 4 - 2) / 2, (Math.random() * 4 - 2) / 2,
         0.03, (i & 1) ? 0.02 : -0.02
       );
     }
