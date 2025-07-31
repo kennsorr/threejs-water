@@ -26,18 +26,8 @@ vec2 intersectCube(vec3 origin, vec3 ray, vec3 cubeMin, vec3 cubeMax) {
 vec3 getWallColor(vec3 point) {
   float scale = 0.5;
 
-  vec3 wallColor;
-  vec3 normal;
-  if (abs(point.x) > 1.999) {
-    wallColor = texture2D(tiles, vec2(point.y * 0.5, point.z * 0.25) + vec2(1.0, 0.5)).rgb;
-    normal = vec3(-point.x, 0.0, 0.0);
-  } else if (abs(point.z) > 1.999) {
-    wallColor = texture2D(tiles, vec2(point.y * 0.5, point.x * 0.25) + vec2(1.0, 0.5)).rgb;
-    normal = vec3(0.0, 0.0, -point.z);
-  } else {
-    wallColor = texture2D(tiles, point.xz * 0.25 + 0.5).rgb;
-    normal = vec3(0.0, 1.0, 0.0);
-  }
+  vec3 wallColor = texture2D(tiles, point.xz * 0.25 + 0.5).rgb;
+  vec3 normal = vec3(0.0, 1.0, 0.0);
 
   scale /= length(point); /* pool ambient occlusion */
 

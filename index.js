@@ -209,42 +209,14 @@ loadFile('shaders/utils.glsl').then((utils) => {
     constructor() {
       this._geometry = new THREE.BufferGeometry();
       const vertices = new Float32Array([
-        -2, -1, -2,
-        -2, -1,  2,
-        -2,  1, -2,
-        -2,  1,  2,
-         2, -1, -2,
-         2,  1, -2,
-         2, -1,  2,
-         2,  1,  2,
-        -2, -1, -2,
-         2, -1, -2,
-        -2, -1,  2,
-         2, -1,  2,
         -2,  1, -2,
         -2,  1,  2,
          2,  1, -2,
          2,  1,  2,
-        -2, -1, -2,
-        -2,  1, -2,
-         2, -1, -2,
-         2,  1, -2,
-        -2, -1,  2,
-         2, -1,  2,
-        -2,  1,  2,
-         2,  1,  2
       ]);
       const indices = new Uint32Array([
         0, 1, 2,
         2, 1, 3,
-        4, 5, 6,
-        6, 5, 7,
-        12, 13, 14,
-        14, 13, 15,
-        16, 17, 18,
-        18, 17, 19,
-        20, 21, 22,
-        22, 21, 23
       ]);
 
       this._geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
